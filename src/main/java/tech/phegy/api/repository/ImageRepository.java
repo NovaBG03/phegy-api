@@ -29,6 +29,7 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
     @Query(nativeQuery = true,
             value = "select * from image i " +
                     "left join vote d on i.id = d.image_id " +
+                    "where i.approved_on is not null " +
                     "group by i.id " +
                     "order by max(d.submitted_at) desc, approved_on desc")
     Page<Image> findAllByApprovedOnNotNullOrderByLatestTipped(Pageable pageable);
@@ -37,7 +38,7 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
             value = "select * from image m " +
                     "left join vote d on m.id = d.image_id " +
                     "join user u on m.publisher_id = u.id " +
-                    "where u.username = :publisherUsername " +
+                    "where u.username = :publisherUsername and m.approved_on is not null " +
                     "group by m.id " +
                     "order by max(d.submitted_at) desc, approved_on desc")
     Page<Image> findAllByPublisherUsernameApprovedOnNotNullOrderByLatestTipped(@Param("publisherUsername") String publisherUsername, Pageable pageable);
@@ -45,6 +46,7 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
     @Query(nativeQuery = true,
             value = "select * from image m " +
                     "left join vote d on m.id = d.image_id " +
+                    "where m.approved_on is not null " +
                     "group by m.id " +
                     "order by sum(d.points) desc, approved_on desc")
     Page<Image> findAllByApprovedOnNotNullOrderByMostTipped(Pageable pageable);
@@ -53,7 +55,7 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
             value = "select * from image m " +
                     "left join vote d on m.id = d.image_id " +
                     "join user u on m.publisher_id = u.id " +
-                    "where u.username = :publisherUsername " +
+                    "where u.username = :publisherUsername and m.approved_on is not null " +
                     "group by m.id " +
                     "order by sum(d.points) desc, approved_on desc")
     Page<Image> findAllByPublisherUsernameApprovedOnNotNullOrderByMostTipped(@Param("publisherUsername") String publisherUsername, Pageable pageable);
@@ -61,7 +63,7 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
     @Query(nativeQuery = true,
             value = "select * from image m " +
                     "left join vote d on m.id = d.image_id " +
-                    "where d.submitted_at BETWEEN NOW() - INTERVAL :days DAY AND NOW() " +
+                    "where d.submitted_at BETWEEN NOW() - INTERVAL :days DAY AND NOW() and m.approved_on is not null " +
                     "group by m.id " +
                     "order by sum(d.points) desc, approved_on desc")
     Page<Image> findAllByApprovedOnNotNullOrderByTopTipped(Pageable pageable, @Param("days") int daysFromNow);
